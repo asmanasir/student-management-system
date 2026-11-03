@@ -1,5 +1,7 @@
 # Byte-compiled / optimized / DLL files
 # Secrets
+.idea/
+.venv/
 .env
 __pycache__/
 *.py[codz]
