@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Classes{% endblock %}
+{% block content %}
+<h1>Classes</h1>
+<ul>
+  {% for c in classes %}
+    <li><a href="{{ url_for('classes.class_detail', class_name=c.class_name) }}">{{ c.class_name }}</a>: {{ c.student_count }} students</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,38 @@
+<!doctype html>
+<!-- A plain HTML page: no Jinja yet. Flask sends it exactly as it is. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">                                                    <!-- so æ, ø and å show correctly -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">      <!-- so it fits on a phone -->
+  <title>About | SMS</title>                                                <!-- the text on the browser tab -->
+</head>
+<body>
+  <header>
+    <h1>About the Student Management System</h1>
+    <p>Made by <strong>class 2A and 2B</strong> &middot; <a href="mailto:post@school.no">post@school.no</a></p>
+  </header>
+  <main>
+    <h2>What it does</h2>
+    <p>The SMS keeps track of our students and classes. It is <em>our</em> project in the Python/Database course.</p>
+    <h2>Our classes</h2>
+    <table>
+      <thead>
+        <tr><th scope="col">Class</th><th scope="col">Room</th><th scope="col">Mentor</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2A</td><td>204</td><td>Hansen</td></tr>
+        <tr><td>2B</td><td>207</td><td>Lie</td></tr>
+      </tbody>
+    </table>
+    <h2>Goals this year</h2>
+    <ul>
+      <li>Add, edit and delete students from the browser</li>
+      <li>Put the project on GitHub with a good README</li>
+    </ul>
+    <img src="https://placehold.co/120x120?text=SMS" alt="The SMS logo" width="120" height="120">
+  </main>
+  <footer>
+    <p><a href="/students">All students</a> &middot; <a href="https://developer.mozilla.org/en-US/docs/Learn/HTML">Learn more HTML</a></p>
+  </footer>
+</body>
+</html>
