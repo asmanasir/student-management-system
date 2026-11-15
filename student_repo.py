@@ -154,6 +154,30 @@ def add_student(first_name, last_name, email, class_name):
         conn.close()
 
 
+def update_student(student_id, first_name, last_name, email, class_name):     # NEW (Lecture 5)
+    """Change one student. The id is the key, so it never changes.
+    Raises EmailTaken if another student already has the email."""
+    conn = get_connection()
+    cursor = None
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE student
+            SET first_name = %s, last_name = %s, email = %s, class_name = %s
+            WHERE student_id = %s
+        """, (first_name, last_name, email, class_name, student_id))   # WHERE: only THIS student
+        conn.commit()                             # save the change for real
+    except mysql.connector.Error as err:
+        conn.rollback()                           # undo the half-done change
+        if err.errno == errorcode.ER_DUP_ENTRY:   # 1062: the email is already used
+            raise EmailTaken(f"{email} is already in use") from err
+        raise
+    finally:
+        if cursor is not None:
+            cursor.close()
+        conn.close()
+
+
 def delete_student(student_id):
     """Delete one student. Returns True if a student was deleted, False if the id didn't exist."""
     conn = get_connection()

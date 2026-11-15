@@ -9,3 +9,4 @@ footer { text-align: center; color: #5b6475; padding: 24px; }
 .flash   { padding: 8px 12px; border-radius: 6px; }
 .success { background: #e8f5e9; color: #1b5e20; }
 .error   { color: #c62828; }
+form.inline { display: inline; margin: 0; }

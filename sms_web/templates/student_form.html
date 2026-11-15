@@ -1,19 +1,35 @@
+{# One form for "Add a student" and "Edit a student".
+   The route sends: heading, action, form (the values to show) and errors.
+   The "or" parts make the Add page work even if student_new() doesn't send them. #}
 {% extends "base.html" %}
-{% block title %}Add a student{% endblock %}
+{% set form = form or {} %}
+{% set errors = errors or {} %}
+{% set heading = heading or "Add a student" %}
+{% block title %}{{ heading }}{% endblock %}
 {% block content %}
-<h1>Add a student</h1>
-<form method="post" action="{{ url_for('students.student_new') }}">
+<h1>{{ heading }}</h1>
+<form method="post" action="{{ action or url_for('students.student_new') }}">
   <p><label for="first_name">First name</label><br>
-     <input id="first_name" name="first_name" required></p>
+     <input id="first_name" name="first_name" value="{{ form.get('first_name', '') }}" required>
+     {% if errors.first_name %}<br><span class="error">{{ errors.first_name }}</span>{% endif %}</p>
   <p><label for="last_name">Last name</label><br>
-     <input id="last_name" name="last_name" required></p>
+     <input id="last_name" name="last_name" value="{{ form.get('last_name', '') }}" required>
+     {% if errors.last_name %}<br><span class="error">{{ errors.last_name }}</span>{% endif %}</p>
   <p><label for="email">Email</label><br>
-     <input id="email" name="email" type="email" required></p>
+     <input id="email" name="email" type="email" value="{{ form.get('email', '') }}" required>
+     {% if errors.email %}<br><span class="error">{{ errors.email }}</span>{% endif %}</p>
   <p><label for="class_name">Class</label><br>
+     {% set classes = ["2A", "2B"] %}
+     {% set current = form.get('class_name', '') %}
      <select id="class_name" name="class_name">
-       <option value="2A">2A</option>
-       <option value="2B">2B</option>
-     </select></p>
+       {% if current and current not in classes %}
+         <option value="{{ current }}" selected>{{ current }}</option>   {# a class that isn't in the list: keep it #}
+       {% endif %}
+       {% for c in classes %}
+         <option value="{{ c }}" {% if c == current %}selected{% endif %}>{{ c }}</option>
+       {% endfor %}
+     </select>
+     {% if errors.class_name %}<br><span class="error">{{ errors.class_name }}</span>{% endif %}</p>
   <button type="submit">Save student</button>
 </form>
 {% endblock %}

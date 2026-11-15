@@ -1,0 +1,16 @@
+{# Shown by the error handlers in __init__.py: 404 (not found), 400 (bad request), 405, 500 ...
+   Works whether the handler sends error=..., or code=... and message=... #}
+{% extends "base.html" %}
+{% if error is defined and error.code is defined %}
+  {% set code = error.code %}
+  {% set message = error.description %}
+{% else %}
+  {% set code = code if code is defined else 500 %}
+  {% set message = message if message is defined else (description if description is defined else "Something went wrong.") %}
+{% endif %}
+{% block title %}Error {{ code }}{% endblock %}
+{% block content %}
+<h1>Error {{ code }}</h1>
+<p>{{ message }}</p>
+<p><a href="{{ url_for('students.student_list') }}">Back to the students</a></p>
+{% endblock %}

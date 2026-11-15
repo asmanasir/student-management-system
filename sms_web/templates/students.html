@@ -9,15 +9,27 @@
 </form>
 
 <table>
-  <tr><th>#</th><th>Name</th><th>Class</th></tr>
+  <tr><th>#</th><th>Name</th><th>Class</th><th>Actions</th></tr>
   {% for s in students %}
     <tr>
       <td>{{ loop.index }}</td>
       <td><a href="{{ url_for('students.student_detail', student_id=s.student_id) }}">{{ s.first_name }} {{ s.last_name }}</a></td>
       <td>{{ s.class_name }}</td>
+      <td>
+        {# U: Edit is a link (GET): it only opens the form #}
+        <a href="{{ url_for('students.student_edit', student_id=s.student_id) }}">Edit</a>
+        {# D: Delete changes data, so it is a small POST form.
+           The question is stored in data-question; confirm() reads it. Cancel = nothing is sent. #}
+        <form method="post" action="{{ url_for('students.student_delete', student_id=s.student_id) }}"
+              style="display: inline; margin: 0;"
+              data-question="Delete {{ s.first_name }} {{ s.last_name }}?"
+              onsubmit="return confirm(this.dataset.question);">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
     </tr>
   {% else %}
-    <tr><td colspan="3">No students found.</td></tr>
+    <tr><td colspan="4">No students found.</td></tr>
   {% endfor %}
 </table>
 
