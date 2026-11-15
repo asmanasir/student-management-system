@@ -4,4 +4,5 @@
 <h1>Student Management System</h1>
 <p><a href="{{ url_for('students.student_list') }}">All students</a> &middot;
    <a href="{{ url_for('classes.class_list') }}">All classes</a></p>
+<p class="stat"><strong>{{ courses|length }}</strong> course{{ "s" if courses|length != 1 }}</p>
 {% endblock %}

@@ -1,25 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Students{% endblock %}
+{% block title %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
 {% block content %}
-<h1>Students</h1>
+<h1>{{ student.first_name }} {{ student.last_name }}</h1>
+<p>Email: {{ student.email }}<br>
+   Class: <a href="{{ url_for('classes.class_list') }}">{{ student.class_name }}</a></p>
 
-<form method="get" action="{{ url_for('students.student_list') }}">
-  <label>Part of a name <input name="q" value="{{ q|default('') }}"></label>
-  <button>Search</button>
-</form>
+{# U and D for this student (Part 2). A div, not a p: a form can't be inside a p. #}
+<div class="actions">
+  <a href="{{ url_for('students.student_edit', student_id=student.student_id) }}">Edit</a>
+  <form method="post" action="{{ url_for('students.student_delete', student_id=student.student_id) }}"
+        style="display: inline; margin: 0;"
+        data-question="Delete {{ student.first_name }} {{ student.last_name }}?"
+        onsubmit="return confirm(this.dataset.question);">
+    <button type="submit">Delete this student</button>
+  </form>
+</div>
 
-<table>
-  <tr><th>#</th><th>Name</th><th>Class</th></tr>
-  {% for s in students %}
-    <tr>
-      <td>{{ loop.index }}</td>
-      <td><a href="{{ url_for('students.student_detail', student_id=s.student_id) }}">{{ s.first_name }} {{ s.last_name }}</a></td>
-      <td>{{ s.class_name }}</td>
-    </tr>
+{# NEW (Lecture 5, Step 5.3): the courses, from the other side of the enrollment table #}
+<h2>{{ courses|length }} course{{ "s" if courses|length != 1 }}</h2>
+<ul>
+  {% for c in courses %}
+    <li><a href="{{ url_for('courses.course_detail', course_code=c.course_code) }}">{{ c.course_code }} {{ c.course_name }}</a>,
+        since {{ c.enrolled_on.strftime("%d.%m.%Y") }}</li>
   {% else %}
-    <tr><td colspan="3">No students found.</td></tr>
+    <li>No courses yet.</li>
   {% endfor %}
-</table>
+</ul>
 
-<p>{{ students|length }} students</p>
+<h2>Classmates in {{ student.class_name }}</h2>
+<ul>
+  {% for s in classmates %}
+    <li><a href="{{ url_for('students.student_detail', student_id=s.student_id) }}">{{ s.first_name }} {{ s.last_name }}</a></li>
+  {% else %}
+    <li>No classmates yet.</li>
+  {% endfor %}
+</ul>
+
+<p><a href="{{ url_for('students.student_list') }}">All students</a></p>
 {% endblock %}

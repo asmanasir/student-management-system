@@ -5,6 +5,7 @@ import re
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
+import course_repo                                   # NEW (Lecture 5, Step 5.3): the student's courses
 import student_repo as repo
 
 bp = Blueprint("students", __name__)
@@ -50,11 +51,14 @@ def student_list():
 
 @bp.route("/students/<int:student_id>")
 def student_detail(student_id):
-    """/students/1: one student."""
+    """/students/1: one student, their courses, and their classmates."""
     student = repo.get_student(student_id)
     if student is None:
         abort(404)
-    return render_template("student.html", student=student)
+    classmates = [s for s in repo.students_in_class(student["class_name"])
+                  if s["student_id"] != student_id]                      # everyone in the class except the student
+    return render_template("student.html", student=student, classmates=classmates,
+                           courses=course_repo.courses_for_student(student_id))   # NEW: the student's courses
 
 
 # ---------- C: create ----------

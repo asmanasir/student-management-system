@@ -7,11 +7,13 @@
 </head>
 <body>
   <nav>
-    <a href="{{ url_for('home') }}">Home</a>
-    <a href="{{ url_for('students.student_list') }}">Students</a>
-    <a href="{{ url_for('classes.class_list') }}">Classes</a>
-    <a href="{{ url_for('about') }}">About</a>
-    <a ref="{{ url_for('about') }}">Contact me </a>
+    <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}class="active" aria-current="page"{% endif %}>Home</a>
+    <a href="{{ url_for('students.student_list') }}" {% if request.blueprint == 'students' %}class="active" aria-current="page"{% endif %}>Students</a>
+    <a href="{{ url_for('classes.class_list') }}" {% if request.blueprint == 'classes' %}class="active" aria-current="page"{% endif %}>Classes</a>
+    {# NEW (Lecture 5, Step 5.1): the way in to the courses #}
+    <a href="{{ url_for('courses.course_list') }}" {% if request.blueprint == 'courses' %}class="active" aria-current="page"{% endif %}>Courses</a>
+    <a href="{{ url_for('about') }}" {% if request.endpoint == 'about' %}class="active" aria-current="page"{% endif %}>About</a>
+    <a href="{{ url_for('about') }}">Contact me</a>   {# fixed: ref → href #}
   </nav>
   <main>
     {# Messages from flash() appear here (Part 4) #}
