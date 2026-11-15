@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import avatar, class_badge %}
+{% block title %}{{ course.course_code }} {{ course.course_name }}{% endblock %}
+{% block content %}
+  <h1>{{ course.course_code }} {{ course.course_name }}</h1>
+  <p>Teacher: {{ course.teacher }} &middot; {{ course.taken }} of {{ course.max_students }} seats taken</p>
+  <h2>{{ students|length|plural("student") }}</h2>
+  <table>
+    <thead>
+      <tr><th scope="col">Name</th><th scope="col">Class</th><th scope="col">Since</th></tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+        <tr>
+          <td>{{ avatar(s) }} <a href="{{ url_for('students.student_detail', student_id=s.student_id) }}">{{ s.first_name }} {{ s.last_name }}</a></td>
+          <td>{{ class_badge(s.class_name) }}</td>
+          <td>{{ s.enrolled_on|nice_date }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="3">No students yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p><a href="{{ url_for('courses.course_list') }}">All courses</a></p>
+{% endblock %}

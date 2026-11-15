@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Courses{% endblock %}
+{% block content %}
+  <h1>Courses</h1>
+  <table>
+    <thead>
+      <tr><th scope="col">Code</th><th scope="col">Name</th><th scope="col">Teacher</th><th scope="col">Seats taken</th></tr>
+    </thead>
+    <tbody>
+      {% for c in courses %}
+        <tr>
+          <td><a href="{{ url_for('courses.course_detail', course_code=c.course_code) }}">{{ c.course_code }}</a></td>
+          <td>{{ c.course_name }}</td>
+          <td>{{ c.teacher }}</td>
+          <td><progress value="{{ c.taken }}" max="{{ c.max_students }}">{{ c.taken }} of {{ c.max_students }}</progress>
+              {{ c.taken }} of {{ c.max_students }}{% if c.taken >= c.max_students %} <strong>full</strong>{% endif %}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4">No courses yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p>{{ courses|length|plural("course") }}</p>
+{% endblock %}
