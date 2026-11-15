@@ -1,5 +1,4 @@
-{# Shown by the error handlers in __init__.py: 404 (not found), 400 (bad request), 405, 500 ...
-   Works whether the handler sends error=..., or code=... and message=... #}
+{# Shown by the error handlers in __init__.py: 404, 400, 405, 500 ... #}
 {% extends "base.html" %}
 {% if error is defined and error.code is defined %}
   {% set code = error.code %}
@@ -10,7 +9,9 @@
 {% endif %}
 {% block title %}Error {{ code }}{% endblock %}
 {% block content %}
-<h1>Error {{ code }}</h1>
-<p>{{ message }}</p>
-<p><a href="{{ url_for('students.student_list') }}">Back to the students</a></p>
+<div class="card" style="text-align: center; padding: 40px 20px;">
+  <h1 style="font-size: 3rem; color: var(--navy);">{{ code }}</h1>
+  <p class="lead">{{ message }}</p>
+  <a class="btn btn-primary" href="{{ url_for('home') }}">Back to the home page</a>
+</div>
 {% endblock %}

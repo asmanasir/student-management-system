@@ -1,37 +1,47 @@
 {% extends "base.html" %}
+{% from "_ui.html" import avatar, course_badge %}
 {% block title %}Students{% endblock %}
 {% block content %}
-<h1>Students</h1>
-<p><a href="{{ url_for('students.student_new') }}">+ Add a student</a></p>
-<form method="get" action="{{ url_for('students.student_list') }}">
-  <label>Part of a name <input name="q" value="{{ q|default('') }}"></label>
+<div class="page-head">
+  <h1>Students</h1>
+  <a class="btn btn-primary" href="{{ url_for('students.student_new') }}">+ Add a student</a>
+</div>
+
+<form class="search" method="get" action="{{ url_for('students.student_list') }}">
+  <label for="q">Part of a name</label>
+  <input id="q" name="q" value="{{ q|default('') }}" placeholder="for example: ha">
   <button>Search</button>
+  {% if q %}<a href="{{ url_for('students.student_list') }}">Show everyone</a>{% endif %}
 </form>
 
 <table>
-  <tr><th>#</th><th>Name</th><th>Class</th><th>Actions</th></tr>
+  <tr><th>#</th><th>Name</th><th>Class</th><th>Courses</th><th>Actions</th></tr>
   {% for s in students %}
     <tr>
-      <td>{{ loop.index }}</td>
-      <td><a href="{{ url_for('students.student_detail', student_id=s.student_id) }}">{{ s.first_name }} {{ s.last_name }}</a></td>
-      <td>{{ s.class_name }}</td>
+      <td class="num">{{ loop.index }}</td>
+      <td>{{ avatar(s) }}<a href="{{ url_for('students.student_detail', student_id=s.student_id) }}">{{ s.first_name }} {{ s.last_name }}</a></td>
+      <td><span class="badge class">{{ s.class_name }}</span></td>
       <td>
-        {# U: Edit is a link (GET): it only opens the form #}
-        <a href="{{ url_for('students.student_edit', student_id=s.student_id) }}">Edit</a>
-        {# D: Delete changes data, so it is a small POST form.
-           The question is stored in data-question; confirm() reads it. Cancel = nothing is sent. #}
-        <form method="post" action="{{ url_for('students.student_delete', student_id=s.student_id) }}"
-              style="display: inline; margin: 0;"
-              data-question="Delete {{ s.first_name }} {{ s.last_name }}?"
-              onsubmit="return confirm(this.dataset.question);">
-          <button type="submit">Delete</button>
-        </form>
+        {# NEW: the courses this student takes, from the enrollment table #}
+        {% for code in (course_map or {}).get(s.student_id, []) %}{{ course_badge(code) }}{% else %}<span class="muted">–</span>{% endfor %}
+      </td>
+      <td>
+        <div class="actions">
+          {# U: Edit is a link (GET): it only opens the form #}
+          <a class="btn btn-small" href="{{ url_for('students.student_edit', student_id=s.student_id) }}">Edit</a>
+          {# D: Delete changes data, so it is a small POST form. confirm() asks first. #}
+          <form class="inline" method="post" action="{{ url_for('students.student_delete', student_id=s.student_id) }}"
+                data-question="Delete {{ s.first_name }} {{ s.last_name }}?"
+                onsubmit="return confirm(this.dataset.question);">
+            <button class="btn-danger btn-small" type="submit">Delete</button>
+          </form>
+        </div>
       </td>
     </tr>
   {% else %}
-    <tr><td colspan="4">No students found.</td></tr>
+    <tr><td colspan="5" class="muted">No students found.</td></tr>
   {% endfor %}
 </table>
 
-<p>{{ students|length }} students</p>
+<p class="muted">{{ students|length }} student{{ "s" if students|length != 1 }}</p>
 {% endblock %}

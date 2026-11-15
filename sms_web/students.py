@@ -46,7 +46,8 @@ def student_list():
         students = repo.search_students(q)
     else:
         students = repo.get_all_students()
-    return render_template("students.html", students=students, q=q)   # q: the search box keeps the word
+    return render_template("students.html", students=students, q=q,       # q: the search box keeps the word
+                           course_map=course_repo.courses_by_student())        # NEW: each student's courses
 
 
 @bp.route("/students/<int:student_id>")
@@ -103,7 +104,47 @@ def student_edit(student_id):
                 return redirect(url_for("students.student_detail", student_id=student_id))  # 6. redirect
     return render_template("student_form.html", form=form, errors=errors,
                            heading=f"Edit {student['first_name']} {student['last_name']}",
-                           action=url_for("students.student_edit", student_id=student_id)), (400 if errors else 200)
+                           action=url_for("students.student_edit", student_id=student_id),
+                           student=student,                                                   # NEW: for the course buttons
+                           courses=course_repo.courses_for_student(student_id),               # NEW: the courses they take
+                           other_courses=course_repo.courses_not_for_student(student_id)
+                           ), (400 if errors else 200)                                         # NEW above: the dropdown
+
+
+# ---------- the student's courses, changed from the Edit page ----------
+@bp.route("/students/<int:student_id>/courses", methods=["POST"])
+def student_add_course(student_id):
+    """C on enrollment: POST only. Put the student in the course chosen in the dropdown."""
+    student = repo.get_student(student_id)
+    if student is None:
+        abort(404)
+    name = f"{student['first_name']} {student['last_name']}"
+    code = request.form.get("course_code", "").strip().upper()
+    if not code:
+        flash("Please choose a course.", "error")
+    else:
+        try:
+            course_repo.enroll(student_id, code)
+        except course_repo.NotFound:
+            abort(404)
+        except course_repo.CourseFull:
+            flash(f"{code} is full.", "error")
+        except course_repo.AlreadyEnrolled:
+            flash(f"{name} already takes {code}.", "error")
+        else:
+            flash(f"{name} is now in {code}.", "success")
+    return redirect(url_for("students.student_edit", student_id=student_id))
+
+
+@bp.route("/students/<int:student_id>/courses/<course_code>/remove", methods=["POST"])
+def student_remove_course(student_id, course_code):
+    """D on enrollment: POST only. Take the student out of one course."""
+    student = repo.get_student(student_id)
+    code = course_code.strip().upper()
+    if student is None or not course_repo.unenroll(student_id, code):
+        abort(404)
+    flash(f"{student['first_name']} {student['last_name']} was removed from {code}.", "success")
+    return redirect(url_for("students.student_edit", student_id=student_id))
 
 
 # ---------- D: delete ----------

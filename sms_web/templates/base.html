@@ -2,21 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{% endblock %} | SMS</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <nav>
+    <a class="brand" href="{{ url_for('home') }}">Student<span>MS</span></a>
     <a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}class="active" aria-current="page"{% endif %}>Home</a>
     <a href="{{ url_for('students.student_list') }}" {% if request.blueprint == 'students' %}class="active" aria-current="page"{% endif %}>Students</a>
     <a href="{{ url_for('classes.class_list') }}" {% if request.blueprint == 'classes' %}class="active" aria-current="page"{% endif %}>Classes</a>
-    {# NEW (Lecture 5, Step 5.1): the way in to the courses #}
     <a href="{{ url_for('courses.course_list') }}" {% if request.blueprint == 'courses' %}class="active" aria-current="page"{% endif %}>Courses</a>
     <a href="{{ url_for('about') }}" {% if request.endpoint == 'about' %}class="active" aria-current="page"{% endif %}>About</a>
-    <a href="{{ url_for('about') }}">Contact me</a>   {# fixed: ref → href #}
+    <a href="{{ url_for('about') }}">Contact me</a>
   </nav>
   <main>
-    {# Messages from flash() appear here (Part 4) #}
+    {# Messages from flash() appear here #}
     {% for category, message in get_flashed_messages(with_categories=true) %}
       <p class="flash {{ category }}">{{ message }}</p>
     {% endfor %}
@@ -24,6 +25,6 @@
     {# Each page puts its own content here #}
     {% block content %}{% endblock %}
   </main>
-  <footer>Student Management System</footer>
+  <footer>Student Management System &middot; Python, Flask and MySQL</footer>
 </body>
 </html>

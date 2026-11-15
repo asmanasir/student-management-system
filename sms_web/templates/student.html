@@ -1,40 +1,47 @@
 {% extends "base.html" %}
+{% from "_ui.html" import avatar %}
 {% block title %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
 {% block content %}
-<h1>{{ student.first_name }} {{ student.last_name }}</h1>
-<p>Email: {{ student.email }}<br>
-   Class: <a href="{{ url_for('classes.class_list') }}">{{ student.class_name }}</a></p>
-
-{# U and D for this student (Part 2). A div, not a p: a form can't be inside a p. #}
-<div class="actions">
-  <a href="{{ url_for('students.student_edit', student_id=student.student_id) }}">Edit</a>
-  <form method="post" action="{{ url_for('students.student_delete', student_id=student.student_id) }}"
-        style="display: inline; margin: 0;"
-        data-question="Delete {{ student.first_name }} {{ student.last_name }}?"
-        onsubmit="return confirm(this.dataset.question);">
-    <button type="submit">Delete this student</button>
-  </form>
+<div class="page-head">
+  <h1>{{ avatar(student) }}{{ student.first_name }} {{ student.last_name }}</h1>
+  {# U and D for this student #}
+  <div class="actions">
+    <a class="btn" href="{{ url_for('students.student_edit', student_id=student.student_id) }}">Edit</a>
+    <form class="inline" method="post" action="{{ url_for('students.student_delete', student_id=student.student_id) }}"
+          data-question="Delete {{ student.first_name }} {{ student.last_name }}?"
+          onsubmit="return confirm(this.dataset.question);">
+      <button class="btn-danger" type="submit">Delete this student</button>
+    </form>
+  </div>
 </div>
 
-{# NEW (Lecture 5, Step 5.3): the courses, from the other side of the enrollment table #}
+<div class="card">
+  <p style="margin: 0;"><strong>Email:</strong> {{ student.email }}<br>
+     <strong>Class:</strong> <span class="badge class">{{ student.class_name }}</span></p>
+</div>
+
+{# The courses, from the other side of the enrollment table #}
 <h2>{{ courses|length }} course{{ "s" if courses|length != 1 }}</h2>
-<ul>
+<table>
+  <tr><th>Course</th><th>Since</th></tr>
   {% for c in courses %}
-    <li><a href="{{ url_for('courses.course_detail', course_code=c.course_code) }}">{{ c.course_code }} {{ c.course_name }}</a>,
-        since {{ c.enrolled_on.strftime("%d.%m.%Y") }}</li>
+    <tr>
+      <td><a href="{{ url_for('courses.course_detail', course_code=c.course_code) }}"><strong>{{ c.course_code }}</strong></a> {{ c.course_name }}</td>
+      <td>{{ c.enrolled_on.strftime("%d.%m.%Y") }}</td>
+    </tr>
   {% else %}
-    <li>No courses yet.</li>
+    <tr><td colspan="2" class="muted">No courses yet. Use Edit to add one.</td></tr>
   {% endfor %}
-</ul>
+</table>
 
 <h2>Classmates in {{ student.class_name }}</h2>
-<ul>
+<p>
   {% for s in classmates %}
-    <li><a href="{{ url_for('students.student_detail', student_id=s.student_id) }}">{{ s.first_name }} {{ s.last_name }}</a></li>
+    <a class="badge" href="{{ url_for('students.student_detail', student_id=s.student_id) }}">{{ s.first_name }} {{ s.last_name }}</a>
   {% else %}
-    <li>No classmates yet.</li>
+    <span class="muted">No classmates yet.</span>
   {% endfor %}
-</ul>
+</p>
 
-<p><a href="{{ url_for('students.student_list') }}">All students</a></p>
+<p><a href="{{ url_for('students.student_list') }}">← All students</a></p>
 {% endblock %}

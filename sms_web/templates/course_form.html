@@ -1,0 +1,35 @@
+{# One template for "Add a course" and "Edit a course". The route sends heading, action, editing, form and errors. #}
+{% extends "base.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<h1>{{ heading }}</h1>
+{% if errors %}<p class="error">Please fix the fields marked in red.</p>{% endif %}
+<div class="card">
+<form method="post" action="{{ action }}">
+  {% if editing %}
+    {# The code is the key: it is shown, not sent. The route takes it from the address. #}
+    <p><label>Course code</label><br><strong style="font-size: 1.2rem;">{{ form.course_code }}</strong>
+       <span class="muted">(can't be changed)</span></p>
+  {% else %}
+    <p><label for="course_code">Course code</label><br>
+       <input id="course_code" name="course_code" value="{{ form.get('course_code', '') }}" required maxlength="7" placeholder="DB101">
+       <br><small class="muted">2–4 letters and 3 digits, like DB101</small>
+       {% if errors.course_code %}<br><span class="error">{{ errors.course_code }}</span>{% endif %}</p>
+  {% endif %}
+  <p><label for="course_name">Course name</label><br>
+     <input id="course_name" name="course_name" value="{{ form.get('course_name', '') }}" required maxlength="100">
+     {% if errors.course_name %}<br><span class="error">{{ errors.course_name }}</span>{% endif %}</p>
+  <p><label for="teacher">Teacher</label><br>
+     <input id="teacher" name="teacher" value="{{ form.get('teacher', '') }}" required maxlength="50">
+     {% if errors.teacher %}<br><span class="error">{{ errors.teacher }}</span>{% endif %}</p>
+  <p><label for="max_students">Max students</label><br>
+     <input id="max_students" name="max_students" type="number" value="{{ form.get('max_students', '') }}" required min="1" max="200">
+     <br><small class="muted">1 to 200</small>
+     {% if errors.max_students %}<br><span class="error">{{ errors.max_students }}</span>{% endif %}</p>
+  <div class="actions">
+    <button class="btn-primary" type="submit">Save course</button>
+    <a class="btn" href="{{ url_for('courses.course_list') }}">Cancel</a>
+  </div>
+</form>
+</div>
+{% endblock %}

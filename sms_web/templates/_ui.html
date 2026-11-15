@@ -1,0 +1,25 @@
+{# _ui.html: small building blocks used by many pages. Import with:
+   {% from "_ui.html" import avatar, seats, course_badge %} #}
+
+{# A circle with the initials: AH for Amir Hassan #}
+{% macro avatar(s) -%}
+  <span class="avatar">{{ (s.first_name or "?")[0]|upper }}{{ (s.last_name or "")[:1]|upper }}</span>
+{%- endmacro %}
+
+{# The seats of a course as a bar: green, orange when 2 or fewer are left, red when full #}
+{% macro seats(c) -%}
+  {% set left = c.max_students - c.taken %}
+  {% set state = "full" if left <= 0 else ("almost" if left <= 2 else "") %}
+  {% set pct = (100 * c.taken / c.max_students) if c.max_students else 0 %}
+  <div class="seats">
+    <div class="bar {{ state }}"><span style="width: {{ [pct, 100]|min|round|int }}%"></span></div>
+    <small>{{ c.taken }} of {{ c.max_students }} seats taken</small>
+    {% if state == "full" %}<span class="badge full">full</span>
+    {% elif state == "almost" %}<span class="badge almost">{{ left }} left</span>{% endif %}
+  </div>
+{%- endmacro %}
+
+{# A course code as a small link: DB101 #}
+{% macro course_badge(code) -%}
+  <a class="badge" href="{{ url_for('courses.course_detail', course_code=code) }}">{{ code }}</a>
+{%- endmacro %}

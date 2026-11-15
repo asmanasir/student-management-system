@@ -1,6 +1,6 @@
 {# One form for "Add a student" and "Edit a student".
    The route sends: heading, action, form (the values to show) and errors.
-   The "or" parts make the Add page work even if student_new() doesn't send them. #}
+   On the Edit page it also sends student, courses and other_courses. #}
 {% extends "base.html" %}
 {% set form = form or {} %}
 {% set errors = errors or {} %}
@@ -8,6 +8,9 @@
 {% block title %}{{ heading }}{% endblock %}
 {% block content %}
 <h1>{{ heading }}</h1>
+{% if errors %}<p class="error">Please fix the fields marked in red.</p>{% endif %}
+
+<div class="card">
 <form method="post" action="{{ action or url_for('students.student_new') }}">
   <p><label for="first_name">First name</label><br>
      <input id="first_name" name="first_name" value="{{ form.get('first_name', '') }}" required>
@@ -30,6 +33,51 @@
        {% endfor %}
      </select>
      {% if errors.class_name %}<br><span class="error">{{ errors.class_name }}</span>{% endif %}</p>
-  <button type="submit">Save student</button>
+  <div class="actions">
+    <button class="btn-primary" type="submit">Save student</button>
+    <a class="btn" href="{{ url_for('students.student_detail', student_id=student.student_id) if student is defined else url_for('students.student_list') }}">Cancel</a>
+  </div>
 </form>
+</div>
+
+{# The student's courses. Only on the Edit page (the Add page has no student yet).
+   These are separate small forms, OUTSIDE the form above: a form can't be inside another form. #}
+{% if courses is defined and student is defined %}
+<h2>Courses</h2>
+<table>
+  <tr><th>Course</th><th>Since</th><th></th></tr>
+  {% for c in courses %}
+    <tr>
+      <td><a href="{{ url_for('courses.course_detail', course_code=c.course_code) }}"><strong>{{ c.course_code }}</strong></a> {{ c.course_name }}</td>
+      <td>{{ c.enrolled_on.strftime("%d.%m.%Y") }}</td>
+      <td>
+        <form class="inline" method="post"
+              action="{{ url_for('students.student_remove_course', student_id=student.student_id, course_code=c.course_code) }}">
+          <button class="btn-danger btn-small" type="submit">Remove</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="3" class="muted">No courses yet.</td></tr>
+  {% endfor %}
+</table>
+
+{% if other_courses %}
+  <form class="row" method="post" action="{{ url_for('students.student_add_course', student_id=student.student_id) }}">
+    <label for="course_code">Add a course</label>
+    <select id="course_code" name="course_code">
+      <option value="">– choose –</option>
+      {% for c in other_courses %}
+        {% set full = c.taken >= c.max_students %}
+        <option value="{{ c.course_code }}" {% if full %}disabled{% endif %}>
+          {{ c.course_code }} {{ c.course_name }} ({{ c.taken }} of {{ c.max_students }}{% if full %}, full{% endif %})
+        </option>
+      {% endfor %}
+    </select>
+    <button class="btn-primary" type="submit">Add</button>
+  </form>
+{% else %}
+  <p class="muted">This student takes every course.</p>
+{% endif %}
+{% endif %}
 {% endblock %}
